@@ -29,26 +29,26 @@ sequenceDiagram
     participant Engine as InferenceEngine
     participant Scheduler as ContinuousBatcher
     participant Cache as PrefixCache & BlockManager
-    participant Backend as ModelBackend (GPU/CUDA)
+    participant Backend as ModelBackend (CUDA)
 
-    Client->>API: POST /generate/stream (Prompt, max_tokens, temp)
+    Client->>API: POST /generate/stream
     API->>Engine: generate_stream()
-    Engine->>Scheduler: add_request(InferenceRequest)
+    Engine->>Scheduler: add_request()
     
     loop Every Iteration Step
-        Scheduler->>Cache: match_prefix(prompt_token_ids)
-        Cache-->>Scheduler: (shared_blocks, matched_tokens)
+        Scheduler->>Cache: match_prefix(prompt_tokens)
+        Cache-->>Scheduler: shared_blocks, matched_tokens
         Scheduler->>Cache: allocate_for_request() / append_slot()
         Scheduler->>Backend: forward_step(active_batch)
         Backend-->>Scheduler: new_token_ids
-        Scheduler->>API: Yield stream chunk (SSE)
-        API-->>Client: data: {"token": " token_str"}
-        opt Request Finished (EOS or max_tokens)
-            Scheduler->>Cache: free_request() (ref_count -= 1)
-            Scheduler->>Cache: insert_prefix() (Store reusable blocks)
+        Scheduler->>API: Yield stream chunk
+        API-->>Client: SSE data chunk
+        opt Request Finished
+            Scheduler->>Cache: free_request()
+            Scheduler->>Cache: insert_prefix()
         end
     end
-    API-->>Client: data: {"finish_reason": "eos", "total_time_ms": ...}
+    API-->>Client: SSE finish event
 ```
 
 ---
@@ -57,22 +57,22 @@ sequenceDiagram
 Rather than reserving contiguous VRAM for each sequence's theoretical maximum length, memory is partitioned into fixed-size physical blocks (e.g., 16 tokens/block). Logical tokens are mapped to physical VRAM blocks dynamically via a per-request `BlockTable`.
 
 ```mermaid
-graph TD
-    subgraph Logical Sequence (Request 1)
-        T0["Tokens 0-15 (Logical Block 0)"]
-        T1["Tokens 16-31 (Logical Block 1)"]
-        T2["Tokens 32-47 (Logical Block 2)"]
+flowchart TD
+    subgraph Logical_Seq ["Logical Sequence"]
+        T0["Tokens 0-15 (Block 0)"]
+        T1["Tokens 16-31 (Block 1)"]
+        T2["Tokens 32-47 (Block 2)"]
     end
 
-    subgraph BlockTable Translation
-        BT["BlockTable: [Physical Block 4, Physical Block 19, Physical Block 2]"]
+    subgraph BlockTable_Map ["BlockTable Translation"]
+        BT["BlockTable: Physical Blocks [4, 19, 2]"]
     end
 
-    subgraph Physical VRAM Tensor Pool
+    subgraph Physical_Pool ["Physical VRAM Pool"]
         P4["Physical Block 4 (VRAM)"]
         P19["Physical Block 19 (VRAM)"]
         P2["Physical Block 2 (VRAM)"]
-        PF["Free Pool: [Block 0, Block 1, Block 3, ...]"]
+        PF["Free Pool: Blocks [0, 1, 3, ...]"]
     end
 
     T0 --> BT
@@ -91,12 +91,12 @@ Traditional static batching waits for the slowest request in a batch to finish b
 ```mermaid
 stateDiagram-v2
     [*] --> WAITING: Client Request Enqueued
-    WAITING --> RUNNING: Admitted by Scheduler (Batch slots & Memory OK)
-    RUNNING --> RUNNING: Token Decoded (Slot Appended)
-    RUNNING --> COMPLETED: EOS Token or Max Tokens Reached
+    WAITING --> RUNNING: Admitted by Scheduler
+    RUNNING --> RUNNING: Token Decoded
+    RUNNING --> COMPLETED: EOS or Max Tokens Reached
     RUNNING --> CANCELLED: Client Disconnected
-    RUNNING --> FAILED: Out of KV Memory (OOM)
-    COMPLETED --> [*]: Blocks Reclaimed (ref_count -= 1)
+    RUNNING --> FAILED: Out of Memory
+    COMPLETED --> [*]: Blocks Reclaimed
     CANCELLED --> [*]: Blocks Reclaimed
     FAILED --> [*]: Blocks Reclaimed
 ```

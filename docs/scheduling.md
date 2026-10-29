@@ -31,10 +31,9 @@ sequenceDiagram
     participant GPU as GPU Batch Execution
 
     Note over GPU: Step t: [Req 1, Req 2, Req 3, Req 4]
-    Req 1->>Scheduler: Emits EOS (Finished)
-    Scheduler->>Queue: Pop Req 5 (Admit)
+    Scheduler->>Queue: Pop Req 5 upon Req 1 EOS
     Scheduler->>GPU: Step t+1: [Req 5 (Prefill), Req 2 (Decode), Req 3 (Decode), Req 4 (Decode)]
-    Note over GPU: Zero GPU slot idle time!
+    Note over GPU: Zero GPU slot idle time
 ```
 
 ---

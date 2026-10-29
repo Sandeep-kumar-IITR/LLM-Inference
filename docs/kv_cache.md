@@ -28,18 +28,20 @@ While small for 0.5B, for a 70B model ($L=80, H_{kv}=8, D=128$), it requires **3
 ## 2. PagedAttention vs Contiguous Allocation
 
 ```mermaid
-graph TD
-    subgraph Traditional Contiguous Allocation
+flowchart TD
+    subgraph Contiguous_Alloc ["Traditional Contiguous Allocation"]
         Req1["Request 1 (Pre-allocates Max 2048)"] --- Used1["Used: 128 Tokens"]
         Req1 --- Waste1["Internal Waste: 1920 Tokens (Unused Reserved VRAM)"]
     end
 
-    subgraph PagedAttention Dynamic Blocks
-        Pool["Free Block Pool (e.g. 16 tokens/block)"]
+    subgraph Paged_Alloc ["PagedAttention Dynamic Blocks"]
+        Pool["Free Block Pool (16 tokens/block)"]
         Pool --> B1["Block 4 (Tokens 0-15)"]
         Pool --> B2["Block 9 (Tokens 16-31)"]
         Pool --> B3["Block 1 (Tokens 32-47)"]
-        B1 & B2 & B3 --> Table["BlockTable: [4, 9, 1]"]
+        B1 --> Table["BlockTable: [4, 9, 1]"]
+        B2 --> Table
+        B3 --> Table
     end
 ```
 

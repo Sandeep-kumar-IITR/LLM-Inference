@@ -7,27 +7,27 @@ The **High-Performance LLM Inference & Serving Engine** is designed to demonstra
 ## 1. System Topology
 
 ```mermaid
-graph TD
+flowchart TD
     Client["Client (HTTP / SSE Stream)"] --> API["FastAPI Serving Layer (Async Uvicorn)"]
     API --> Engine["InferenceEngine Orchestrator"]
 
-    subgraph Memory Management
+    subgraph Memory_Mgmt ["Memory Management"]
         Engine --> BM["KV BlockManager"]
         Engine --> PC["PrefixCache (LRU)"]
         BM --> BT["Logical-to-Physical BlockTables"]
         BM --> TensorPool["Physical KV Tensor Storage"]
     end
 
-    subgraph Dynamic Scheduling
+    subgraph Dynamic_Sched ["Dynamic Scheduling"]
         Engine --> CB["ContinuousBatcher"]
         CB --> WQ["Waiting Queue (FIFO/SJF)"]
         CB --> RB["Running Batch (Dynamic Slots)"]
     end
 
-    subgraph Compute Backends
+    subgraph Compute_Backends ["Compute Backends"]
         Engine --> MB["ModelBackend Interface"]
         MB --> HF["Transformers / PyTorch Baseline"]
-        MB --> Native["Native C++/CUDA Kernels (RMSNorm, SwiGLU)"]
+        MB --> Native["Native C++/CUDA Kernels"]
     end
 
     Engine --> Metrics["MetricsCollector & Benchmark Engine"]

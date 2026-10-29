@@ -16,15 +16,19 @@
 ## 2. Benchmark Suite Architecture
 
 ```mermaid
-graph TD
+flowchart TD
     Suite["Benchmark Suite"] --> Lat["1. Latency Benchmark (benchmarks/benchmark_latency.py)"]
     Suite --> TP["2. Throughput Benchmark (benchmarks/benchmark_throughput.py)"]
     Suite --> Conc["3. Concurrency Benchmark (benchmarks/benchmark_concurrency.py)"]
     Suite --> Quant["4. Quantization Benchmark (benchmarks/benchmark_quantization.py)"]
 
-    Lat & TP & Conc & Quant --> Runner["BenchmarkRunner (app/metrics/benchmark.py)"]
+    Lat --> Runner["BenchmarkRunner (app/metrics/benchmark.py)"]
+    TP --> Runner
+    Conc --> Runner
+    Quant --> Runner
+
     Runner --> CSV["Structured CSV Logs (benchmarks/results/*.csv)"]
-    Runner --> Report["Summary Statistical Report (Markdown / Console)"]
+    Runner --> Report["Summary Statistical Report"]
 ```
 
 ---
