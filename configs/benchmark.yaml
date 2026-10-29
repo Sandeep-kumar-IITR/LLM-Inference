@@ -1,0 +1,30 @@
+model:
+  name: "Qwen/Qwen2.5-0.5B-Instruct"
+  precision: "auto"
+  device: "auto"
+  max_seq_len: 2048
+  trust_remote_code: true
+
+generation:
+  max_new_tokens: 128
+  temperature: 0.0
+  top_p: 1.0
+  top_k: 0
+  repetition_penalty: 1.0
+  do_sample: false
+
+server:
+  host: "127.0.0.1"
+  port: 8000
+  max_concurrent_requests: 32
+  max_input_tokens: 1024
+  request_timeout: 300
+
+benchmark:
+  warmup_iterations: 3
+  num_iterations: 10
+  concurrency_levels: [1, 2, 4, 8]
+  prompt_lengths: [32, 128, 512]
+  output_lengths: [32, 64, 128]
+  results_dir: "benchmarks/results"
+  generate_plots: true

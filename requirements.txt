@@ -1,0 +1,24 @@
+# LLM Inference Engine Dependencies
+# PyTorch with CUDA should be installed via conda:
+# conda install pytorch torchvision torchaudio pytorch-cuda=12.4 -c pytorch -c nvidia
+
+transformers>=4.45.0,<4.50.0
+accelerate>=0.34.0,<1.0.0
+safetensors>=0.4.0,<1.0.0
+sentencepiece>=0.2.0
+
+fastapi>=0.115.0,<1.0.0
+uvicorn[standard]>=0.30.0,<1.0.0
+sse-starlette>=2.0.0,<3.0.0
+pydantic>=2.0.0,<3.0.0
+pydantic-settings>=2.0.0,<3.0.0
+
+pyyaml>=6.0.0,<7.0.0
+
+pytest>=8.0.0,<9.0.0
+pytest-asyncio>=0.24.0,<1.0.0
+httpx>=0.27.0,<1.0.0
+
+psutil>=6.0.0,<7.0.0
+pandas>=2.2.0,<3.0.0
+matplotlib>=3.9.0,<4.0.0

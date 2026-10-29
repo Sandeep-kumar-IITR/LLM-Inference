@@ -1,0 +1,36 @@
+model:
+  name: "Qwen/Qwen2.5-0.5B-Instruct"
+  precision: "auto"  # auto, float16, bfloat16, float32, int4, fp8
+  device: "auto"     # auto, cuda, cpu
+  max_seq_len: 2048
+  trust_remote_code: true
+
+generation:
+  max_new_tokens: 256
+  temperature: 0.7
+  top_p: 0.9
+  top_k: 50
+  repetition_penalty: 1.1
+  do_sample: true
+
+server:
+  host: "0.0.0.0"
+  port: 8000
+  max_concurrent_requests: 16
+  max_input_tokens: 1024
+  request_timeout: 120
+
+cache:
+  block_size: 16
+  num_blocks: 256
+  enable_prefix_cache: true
+  max_prefix_entries: 128
+
+scheduler:
+  max_batch_size: 8
+  policy: "fcfs"
+  scheduling_interval: 0.01
+
+logging:
+  level: "INFO"
+  format: "%(asctime)s | %(levelname)-8s | %(name)s | %(message)s"

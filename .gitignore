@@ -1,0 +1,48 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.pyd
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Model weights (large files)
+models/
+*.bin
+*.safetensors
+*.gguf
+
+# Benchmark outputs
+benchmarks/results/*.csv
+benchmarks/results/*.png
+benchmarks/results/*.json
+
+# Native extension build artifacts
+native/build/
+native/*.so
+native/*.pyd
+native/*.dll
+
+# Logs
+*.log
+
+# HuggingFace cache
+.cache/

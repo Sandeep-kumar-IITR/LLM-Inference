@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-inference-engine"
+version = "0.1.0"
+description = "High-performance LLM inference & serving engine"
+readme = "README.md"
+requires-python = ">=3.11,<3.13"
+license = {text = "MIT"}
+authors = [
+    {name = "LLM Inference Team"}
+]
+
+dependencies = [
+    "transformers>=4.45.0,<4.50.0",
+    "accelerate>=0.34.0,<1.0.0",
+    "safetensors>=0.4.0,<1.0.0",
+    "sentencepiece>=0.2.0",
+    "fastapi>=0.115.0,<1.0.0",
+    "uvicorn[standard]>=0.30.0,<1.0.0",
+    "sse-starlette>=2.0.0,<3.0.0",
+    "pydantic>=2.0.0,<3.0.0",
+    "pydantic-settings>=2.0.0,<3.0.0",
+    "pyyaml>=6.0.0,<7.0.0",
+    "psutil>=6.0.0,<7.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0.0,<9.0.0",
+    "pytest-asyncio>=0.24.0,<1.0.0",
+    "httpx>=0.27.0,<1.0.0",
+]
+benchmark = [
+    "pandas>=2.2.0,<3.0.0",
+    "matplotlib>=3.9.0,<4.0.0",
+]
+quantization = [
+    "bitsandbytes>=0.43.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = [
+    "gpu: requires NVIDIA GPU",
+    "slow: slow running test",
+    "native: requires compiled native extensions",
+]
+
+[tool.setuptools.packages.find]
+include = ["app*"]
